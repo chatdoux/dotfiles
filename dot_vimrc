@@ -1,0 +1,150 @@
+"──────▄▀▄─────▄▀▄
+"─────▄█░░▀▀▀▀▀░░█▄
+"─▄▄──█░░░░░░░░░░░█──▄▄
+"█▄▄█─█░░▀░░┬░░▀░░█─█▄▄█
+
+set nocompatible
+syntax on
+filetype plugin indent on
+
+
+""""" plugins
+
+call plug#begin('~/.vim/plugged')
+
+Plug 'NLKNguyen/papercolor-theme'
+Plug 'edkolev/tmuxline.vim'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+Plug 'dietsche/vim-lastplace'
+Plug 'scrooloose/nerdcommenter'
+Plug 'tpope/vim-fugitive'
+Plug 'airblade/vim-gitgutter'
+
+call plug#end()
+
+
+""""" preferences
+
+set autoindent
+set smartindent
+set expandtab
+set smarttab
+set copyindent
+set softtabstop=4
+set tabstop=4
+set shiftwidth=4
+set shiftround
+set showmatch
+
+set ignorecase
+set smartcase
+set incsearch
+set hlsearch
+
+set hidden
+set backspace=indent,eol,start
+set virtualedit=block
+set scrolloff=4
+set history=1000
+set undolevels=1000
+set visualbell
+set noerrorbells
+set noswapfile
+set wildmenu
+set wildmode=longest,list
+set wildignorecase
+set wildignore=*.sw?,*.bak,*.pyc,*.class,*.egg-info,.git,.svn,.hg,.bzr,*.DS_Store
+set showcmd
+set shortmess=atI
+set display=lastline,uhex
+set confirm
+set clipboard+=unnamed
+set nofoldenable
+set nojoinspaces
+set number
+set ruler
+set splitbelow
+set splitright
+set fillchars=diff:⣿,vert:│
+set laststatus=2
+
+
+""""" appearance
+
+set background=light
+colorscheme PaperColor
+
+
+""""" common shortcuts
+
+let mapleader="\<space>"
+
+nmap <silent> <leader>ev :e $MYVIMRC<CR>
+nmap <silent> <leader>sv :so $MYVIMRC<CR>
+nmap <silent> <leader>/ :nohlsearch<CR>
+
+nmap j gj
+nmap k gk
+
+noremap H ^
+noremap L g_
+
+vnoremap < <gv
+vnoremap > >gv
+
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+
+inoremap <C-h> <Esc><C-w>h
+inoremap <C-j> <Esc><C-w>j
+inoremap <C-k> <Esc><C-w>k
+inoremap <C-l> <Esc><C-w>l
+
+nmap <leader>, :bnext<CR>
+nmap <leader>. :bprevious<CR>
+
+
+""""" netrw
+
+let g:netrw_banner = 0
+let g:netrw_winsize = 25
+
+
+""""" fzf
+
+nnoremap <C-b> <Esc>:Buffers<CR>
+nnoremap <C-e> <Esc>:Commands<CR>
+nnoremap <C-x> <Esc>:Rg<CR>
+nnoremap <C-p> <Esc>:FZF<CR>
+let g:fzf_layout = { 'window': 'enew' }
+
+
+""""" tmuxline
+
+" How to update:
+" :Tmuxline vim_statusline_3
+" :TmuxlineSnapshot! ~/.tmux/tmuxline_snapshot
+" <C-f>I
+
+let g:tmuxline_powerline_separators = 0
+let g:tmuxline_preset = 'tmux'
+
+
+""""" Git
+
+noremap <Leader>gs :Git<CR>
+noremap <Leader>ga :Gwrite<CR>
+noremap <Leader>gc :Git commit<CR>
+noremap <Leader>gsh :Git push<CR>
+noremap <Leader>gb :Git blame<CR>
+noremap <Leader>gr :GRemove<CR>
+noremap <Leader>gll :Git pull<CR>
+noremap <Leader>gd :Gvdiff<CR>
+vnoremap <leader>gb :Git blame<CR>
+nnoremap <leader>gb :Git blame<CR>
+
+let g:gitgutter_sign_column_always = 1
+let g:gitgutter_override_sign_column_highlight = 0

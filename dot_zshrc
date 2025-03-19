@@ -1,0 +1,146 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+if [[ -f "/opt/homebrew/bin/brew" ]] then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+    FPATH="/opt/homebrew/share/zsh/site-functions:$FPATH"
+fi
+
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+[ ! -d $ZINIT_HOME ] && mkdir -p "$(dirname $ZINIT_HOME)"
+[ ! -d $ZINIT_HOME/.git ] && git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+source "${ZINIT_HOME}/zinit.zsh"
+
+zinit ice depth=1; zinit light romkatv/powerlevel10k
+
+zinit light zsh-users/zsh-syntax-highlighting
+zinit light zsh-users/zsh-completions
+zinit light Aloxaf/fzf-tab
+
+autoload -Uz compinit && compinit
+zinit cdreplay -q
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# Keybindings
+bindkey -e
+bindkey '^p' history-search-backward
+bindkey '^n' history-search-forward
+bindkey '^[[3~' delete-char
+bindkey '\eb' emacs-backward-word
+bindkey '\ef' emacs-forward-word
+
+## Allow command line editing in an external editor.
+autoload -Uz edit-command-line
+zle -N edit-command-line
+bindkey '\C-X\C-E' edit-command-line
+
+# zsh options
+unsetopt BEEP
+setopt complete_aliases
+setopt interactivecomments
+
+## history
+HISTFILE="${HISTFILE:-${ZDOTDIR:-$HOME}/.zsh_history}"
+HISTSIZE=10000
+SAVEHIST=$HISTSIZE
+setopt BANG_HIST              # Treat the '!' character specially during expansion.
+setopt EXTENDED_HISTORY       # Write the history file in the ':start:elapsed;command' format.
+setopt SHARE_HISTORY          # Share history between all sessions.
+setopt HIST_EXPIRE_DUPS_FIRST # Expire a duplicate event first when trimming history.
+setopt HIST_IGNORE_DUPS       # Do not record an event that was just recorded again.
+setopt HIST_IGNORE_ALL_DUPS   # Delete an old recorded event if a new event is a duplicate.
+setopt HIST_FIND_NO_DUPS      # Do not display a previously found event.
+setopt HIST_IGNORE_SPACE      # Do not record an event starting with a space.
+setopt HIST_SAVE_NO_DUPS      # Do not write a duplicate event to the history file.
+setopt HIST_VERIFY            # Do not execute immediately upon history expansion.
+
+## directory
+setopt AUTO_CD              # Auto changes to a directory without typing cd.
+setopt AUTO_PUSHD           # Push the old directory onto the stack on cd.
+setopt PUSHD_IGNORE_DUPS    # Do not store duplicates in the stack.
+setopt PUSHD_SILENT         # Do not print the directory stack after pushd or popd.
+setopt PUSHD_TO_HOME        # Push to home directory when no argument is given.
+setopt CDABLE_VARS          # Change directory to a path stored in a variable.
+setopt MULTIOS              # Write to multiple descriptors.
+setopt EXTENDED_GLOB        # Use extended globbing syntax.
+unsetopt CLOBBER            # Do not overwrite existing files with > and >>. Use >! and >>! to bypass.
+
+# Environment
+export EDITOR='vim'
+export VISUAL=$EDITOR
+export PAGER='less'
+export LESS='-g -i -M -R -S -w -X -z-4'
+export LANG='en_US.UTF-8'
+export GPG_TTY=$TTY
+export WORDCHARS='*?_-.[]~&;!#$%^(){}<>'
+
+# Aliases
+alias ls='ls -G'
+alias l='ls -1A'
+alias ll='ls -lh'
+alias http='xh'
+alias pip='python -m pip'
+
+# Work stuff
+if [[ -s "$HOME/.config/zsh/work" ]]; then
+  source "$HOME/.config/zsh/work"
+fi
+
+jwtd () {
+  local input="${1:-}"
+  if [ -z "$input" ]; then
+    if [ ! -t 0 ]; then
+      input=$(cat /dev/stdin)
+    else
+      echo >&2 '✗ Need an argument or have a piped input!'
+      return 1
+    fi
+  fi
+  echo "$input" \
+    | jq -Rrce 'split(".")[1] | . + "=" * (. | 4 - length % 4)' \
+    | openssl base64 -d -A \
+    | jq .
+}
+
+# uv
+export UV_PIP_CONFIG="$HOME/.config/pip/pip.conf"
+
+# fzf
+source <(fzf --zsh)
+export FZF_DEFAULT_COMMAND="fd --type f --hidden --no-ignore --exclude '.git/*' --exclude 'node_modules/*'"
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND="fd --type d"
+
+## colorscheme PaperColor
+export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
+	--color=fg:#4d4d4c,bg:#eeeeee,hl:#d7005f
+	--color=fg+:#4d4d4c,bg+:#e8e8e8,hl+:#d7005f
+	--color=info:#4271ae,prompt:#8959a8,pointer:#d7005f
+	--color=marker:#4271ae,spinner:#4271ae,header:#4271ae'
+
+## completion
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+zstyle ':completion:*:git-checkout:*' sort false
+zstyle ':completion:*:descriptions' format '[%d]'
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*' menu no
+zstyle ':fzf-tab:complete:*' fzf-preview 'ls --color $realpath'
+zstyle ':fzf-tab:*' use-fzf-default-opts yes
+zstyle ':fzf-tab:*' switch-group '<' '>'
+zstyle ':fzf-tab:*' fzf-bindings 'ctrl-x:toggle'
+
+# docker
+source <(docker completion zsh)
+
+# node
+eval "$(fnm env)"
+
+# vault
+autoload -U +X bashcompinit && bashcompinit
+complete -o nospace -C /opt/homebrew/bin/vault vault
