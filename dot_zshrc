@@ -10,6 +10,10 @@ if [[ -f "/opt/homebrew/bin/brew" ]] then
     FPATH="/opt/homebrew/share/zsh/site-functions:$FPATH"
 fi
 
+if [[ -d "$HOME/.docker/completions" ]] then
+    fpath=($HOME/.docker/completions $fpath)
+fi
+
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 [ ! -d $ZINIT_HOME ] && mkdir -p "$(dirname $ZINIT_HOME)"
 [ ! -d $ZINIT_HOME/.git ] && git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
@@ -88,8 +92,8 @@ alias http='xh'
 alias pip='python -m pip'
 
 # Work stuff
-if [[ -s "$HOME/.config/zsh/work" ]]; then
-  source "$HOME/.config/zsh/work"
+if [[ -s "$HOME/.config/zsh/work.zsh" ]]; then
+  source "$HOME/.config/zsh/work.zsh"
 fi
 
 jwtd () {
@@ -110,6 +114,7 @@ jwtd () {
 
 # uv
 export UV_PIP_CONFIG="$HOME/.config/pip/pip.conf"
+export PATH="$HOME/.local/bin:$PATH"
 
 # fzf
 source <(fzf --zsh)
@@ -135,12 +140,13 @@ zstyle ':fzf-tab:*' use-fzf-default-opts yes
 zstyle ':fzf-tab:*' switch-group '<' '>'
 zstyle ':fzf-tab:*' fzf-bindings 'ctrl-x:toggle'
 
-# docker
-source <(docker completion zsh)
-
 # node
 eval "$(fnm env)"
 
 # vault
 autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C /opt/homebrew/bin/vault vault
+
+# psql
+export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
+
