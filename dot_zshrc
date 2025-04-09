@@ -112,10 +112,6 @@ jwtd () {
     | jq .
 }
 
-# uv
-export UV_PIP_CONFIG="$HOME/.config/pip/pip.conf"
-export PATH="$HOME/.local/bin:$PATH"
-
 # fzf
 source <(fzf --zsh)
 export FZF_DEFAULT_COMMAND="fd --type f --hidden --no-ignore --exclude '.git/*' --exclude 'node_modules/*'"
@@ -140,8 +136,12 @@ zstyle ':fzf-tab:*' use-fzf-default-opts yes
 zstyle ':fzf-tab:*' switch-group '<' '>'
 zstyle ':fzf-tab:*' fzf-bindings 'ctrl-x:toggle'
 
-# node
-eval "$(fnm env)"
+# go
+export PATH="$HOME/go/bin:$PATH"
+
+# uv
+export UV_PIP_CONFIG="$HOME/.config/pip/pip.conf"
+export PATH="$HOME/.local/bin:$PATH"
 
 # vault
 autoload -U +X bashcompinit && bashcompinit
@@ -149,4 +149,7 @@ complete -o nospace -C /opt/homebrew/bin/vault vault
 
 # psql
 export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
+
+# node
+eval "$(fnm env)"
 
