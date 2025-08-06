@@ -96,7 +96,7 @@ if [[ -s "$HOME/.config/zsh/work.zsh" ]]; then
   source "$HOME/.config/zsh/work.zsh"
 fi
 
-jwtd () {
+function jwtd() {
   local input="${1:-}"
   if [ -z "$input" ]; then
     if [ ! -t 0 ]; then
