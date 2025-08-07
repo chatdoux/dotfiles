@@ -96,22 +96,6 @@ if [[ -s "$HOME/.config/zsh/work.zsh" ]]; then
   source "$HOME/.config/zsh/work.zsh"
 fi
 
-function jwtd() {
-  local input="${1:-}"
-  if [ -z "$input" ]; then
-    if [ ! -t 0 ]; then
-      input=$(cat /dev/stdin)
-    else
-      echo >&2 '✗ Need an argument or have a piped input!'
-      return 1
-    fi
-  fi
-  echo "$input" \
-    | jq -Rrce 'split(".")[1] | . + "=" * (. | 4 - length % 4)' \
-    | openssl base64 -d -A \
-    | jq .
-}
-
 # fzf
 source <(fzf --zsh)
 export FZF_DEFAULT_COMMAND="fd --type f --hidden --no-ignore --exclude '.git/*' --exclude 'node_modules/*'"
